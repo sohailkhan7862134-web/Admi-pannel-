@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Tournament Admin Panel</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#080d19;color:#fff}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+
+:root{
+ --bg:#080d19;
+ --side:#0d1424;
+ --card:#121b2e;
+ --card2:#18233a;
+ --border:#263653;
+ --muted:#8d9ab5;
+ --purple:#7067ff;
+ --green:#1fd39b;
+ --red:#ff5372;
+ --yellow:#ffbc55;
+}
+
+.login{
+ min-height:100vh;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ padding:20px;
+ background:
+ radial-gradient(circle at 20% 20%,#292365,transparent 35%),
+ radial-gradient(circle at 85% 80%,#123d4d,transparent 35%),#080d19;
+}
+
+.login-box{
+ width:100%;
+ max-width:410px;
+ padding:35px;
+ border-radius:25px;
+ background:rgba(18,27,46,.96);
+ border:1px solid var(--border);
+ box-shadow:0 30px 80px #0008;
+}
+
+.logo{
+ width:65px;height:65px;
+ display:grid;place-items:center;
+ background:linear-gradient(135deg,#8279ff,#5148db);
+ border-radius:19px;
+ font-size:30px;
+ margin-bottom:20px
+}
+.login-box h1{font-size:28px}
+.login-box p{color:var(--muted);margin:8px 0 25px}
+
+label{
+ display:block;
+ color:#aeb9ce;
+ font-size:13px;
+ margin-bottom:7px
+}
+.field{margin-bottom:16px}
+
+input,select,textarea{
+ width:100%;
+ background:#0b1221;
+ color:#fff;
+ border:1px solid var(--border);
+ outline:none;
+ border-radius:11px;
+ padding:12px 13px
+}
+input:focus,select:focus,textarea:focus{border-color:var(--purple)}
+textarea{min-height:100px;resize:vertical}
+
+.btn{
+ border:0;
+ border-radius:10px;
+ padding:11px 15px;
+ color:#fff;
+ background:var(--purple);
+ font-weight:bold
+}
+.btn:hover{opacity:.88}
+.full{width:100%}
+.green{background:#159d74}
+.red{background:#d83e5c}
+.yellow{background:#b47b24}
+.dark{background:#202c45;border:1px solid var(--border)}
+.small{font-size:12px;padding:8px 10px}
+
+.demo{
+ margin-top:16px;
+ background:#0b1221;
+ padding:12px;
+ border-radius:10px;
+ text-align:center;
+ color:var(--muted);
+ font-size:12px
+}
+
+/* APP */
+.app{display:none;min-height:100vh}
+
+.sidebar{
+ position:fixed;
+ top:0;left:0;bottom:0;
+ width:245px;
+ padding:22px 15px;
+ background:var(--side);
+ border-right:1px solid var(--border);
+ z-index:50
+}
+
+.brand{
+ font-size:19px;
+ font-weight:bold;
+ padding:10px 12px 28px
+}
+.brand span{color:#8179ff}
+
+.nav button{
+ width:100%;
+ border:0;
+ background:transparent;
+ color:#8996b2;
+ text-align:left;
+ padding:13px;
+ border-radius:11px;
+ margin-bottom:5px;
+ font-weight:bold
+}
+.nav button:hover,.nav button.active{
+ background:#19233b;
+ color:#fff
+}
+
+.logout{
+ position:absolute;
+ bottom:20px;
+ left:15px;
+ right:15px
+}
+
+.main{
+ margin-left:245px;
+ padding:25px;
+ max-width:1600px
+}
+
+.topbar{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin-bottom:25px
+}
+.topbar h2{font-size:25px}
+.topbar p{color:var(--muted);font-size:13px;margin-top:5px}
+
+.badge{
+ padding:10px 14px;
+ background:#18233a;
+ border:1px solid var(--border);
+ border-radius:12px;
+ color:#b8c2d6
+}
+
+.page{display:none}
+.page.active{display:block}
+
+/* STATS */
+.stats{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:15px;
+ margin-bottom:20px
+}
+.stat{
+ background:linear-gradient(145deg,#141e34,#101829);
+ border:1px solid var(--border);
+ border-radius:18px;
+ padding:19px
+}
+.stat-top{
+ display:flex;
+ justify-content:space-between;
+ color:var(--muted)
+}
+.icon{
+ width:42px;height:42px;
+ display:grid;place-items:center;
+ background:#202b48;
+ border-radius:12px;
+ font-size:19px
+}
+.stat h3{font-size:28px;margin-top:16px}
+.stat p{font-size:12px;color:var(--muted);margin-top:5px}
+
+/* CARDS */
+.card{
+ background:var(--card);
+ border:1px solid var(--border);
+ border-radius:18px;
+ padding:20px;
+ margin-bottom:18px
+}
+.card-head{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:10px;
+ margin-bottom:17px
+}
+
+.grid2{
+ display:grid;
+ grid-template-columns:1.5fr 1fr;
+ gap:18px
+}
+
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:700px}
+th{
+ text-align:left;
+ color:#8190ad;
+ font-size:12px;
+ padding:12px;
+ border-bottom:1px solid var(--border)
+}
+td{
+ padding:13px 12px;
+ border-bottom:1px solid #202b43;
+ font-size:13px
+}
+
+.status{
+ display:inline-block;
+ padding:6px 9px;
+ border-radius:20px;
+ font-size:11px;
+ font-weight:bold
+}
+.live{background:#123d34;color:#40dfae}
+.upcoming{background:#3c3018;color:#ffc967}
+.completed{background:#242d41;color:#aeb9ce}
+.pending{background:#3c3018;color:#ffc967}
+.approved{background:#123d34;color:#40dfae}
+.rejected{background:#421e2b;color:#ff7890}
+
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+
+.toolbar{
+ display:flex;
+ justify-content:space-between;
+ gap:10px;
+ margin-bottom:18px
+}
+.search{max-width:320px}
+
+.empty{
+ text-align:center;
+ color:var(--muted);
+ padding:35px
+}
+
+/* MODAL */
+.modal{
+ display:none;
+ position:fixed;
+ inset:0;
+ background:#000b;
+ z-index:100;
+ align-items:center;
+ justify-content:center;
+ padding:18px
+}
+.modal.show{display:flex}
+.modal-box{
+ width:100%;
+ max-width:720px;
+ max-height:92vh;
+ overflow:auto;
+ background:#111a2d;
+ border:1px solid var(--border);
+ border-radius:22px;
+ padding:23px
+}
+.modal-head{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin-bottom:20px
+}
+.close{
+ border:0;
+ background:#202c45;
+ color:#fff;
+ width:35px;height:35px;
+ border-radius:10px;
+ font-size:19px
+}
+.form-grid{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:15px
+}
+.full-field{grid-column:1/-1}
+
+.qr-preview{
+ display:none;
+ width:150px;height:150px;
+ object-fit:contain;
+ background:#fff;
+ padding:8px;
+ border-radius:10px;
+ margin-top:10px
+}
+
+.modal-actions{
+ display:flex;
+ justify-content:flex-end;
+ gap:10px;
+ margin-top:20px
+}
+
+.mobile-menu{
+ display:none;
+ border:0;
+ background:#19243c;
+ color:#fff;
+ padding:10px 13px;
+ border-radius:10px
+}
+.overlay{
+ display:none;
+ position:fixed;
+ inset:0;
+ background:#0008;
+ z-index:40
+}
+
+/* MOBILE */
+@media(max-width:1050px){
+ .stats{grid-template-columns:repeat(2,1fr)}
+ .grid2{grid-template-columns:1fr}
+}
+
+@media(max-width:750px){
+ .sidebar{
+  transform:translateX(-100%);
+  transition:.25s
+ }
+ .sidebar.open{transform:translateX(0)}
+ .overlay.show{display:block}
+ .main{margin-left:0;padding:16px}
+ .mobile-menu{display:block}
+ .topbar{align-items:flex-start}
+ .badge{display:none}
+ .stats{gap:10px}
+ .stat{padding:15px}
+ .stat h3{font-size:23px}
+ .form-grid{grid-template-columns:1fr}
+ .full-field{grid-column:auto}
+ .toolbar{flex-direction:column}
+ .search{max-width:none}
+}
+
+@media(max-width:450px){
+ .stats{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="login" id="loginScreen">
+ <div class="login-box">
+  <div class="logo">🏆</div>
+  <h1>Admin Panel</h1>
+  <p>Manage your tournament platform</p>
+
+  <div class="field">
+   <label>Username</label>
+   <input id="loginUser" placeholder="Enter username">
+  </div>
+
+  <div class="field">
+   <label>Password</label>
+   <input id="loginPass" type="password" placeholder="Enter password">
+  </div>
+
+  <button class="btn full" onclick="login()">Login to Dashboard</button>
+
+  <div class="demo">
+   Demo Login: <b>admin</b> / <b>1234</b>
+  </div>
+ </div>
+</div>
+
+
+<!-- APP -->
+<div class="app" id="app">
+
+<aside class="sidebar" id="sidebar">
+
+ <div class="brand">🏆 <span>Tournament</span> Admin</div>
+
+ <div class="nav">
+  <button class="active" onclick="showPage('dashboard',this)">📊 Dashboard</button>
+  <button onclick="showPage('tournaments',this)">🏆 Tournaments</button>
+  <button onclick="showPage('players',this)">👥 Players</button>
+  <button onclick="showPage('payments',this)">💳 Payments</button>
+  <button onclick="showPage('announcements',this)">📢 Announcements</button>
+  <button onclick="showPage('settings',this)">⚙️ Settings</button>
+ </div>
+
+ <button class="btn red full logout" onclick="logout()">Logout</button>
+</aside>
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<main class="main">
+
+<div class="topbar">
+ <div style="display:flex;gap:12px;align-items:flex-start">
+  <button class="mobile-menu" onclick="openSidebar()">☰</button>
+  <div>
+   <h2 id="pageTitle">Dashboard</h2>
+   <p>Welcome back, Admin 👋</p>
+  </div>
+ </div>
+ <div class="badge">🛡️ Administrator</div>
+</div>
+
+
+<!-- DASHBOARD -->
+<section class="page active" id="dashboard">
+
+<div class="stats">
+
+ <div class="stat">
+  <div class="stat-top">
+   <span>Tournaments</span><div class="icon">🏆</div>
+  </div>
+  <h3 id="totalTournaments">0</h3>
+  <p>Total tournaments</p>
+ </div>
+
+ <div class="stat">
+  <div class="stat-top">
+   <span>Players</span><div class="icon">👥</div>
+  </div>
+  <h3 id="totalPlayers">0</h3>
+  <p>Registered players</p>
+ </div>
+
+ <div class="stat">
+  <div class="stat-top">
+   <span>Revenue</span><div class="icon">💰</div>
+  </div>
+  <h3>₹<span id="totalRevenue">0</span></h3>
+  <p>Approved payments</p>
+ </div>
+
+ <div class="stat">
+  <div class="stat-top">
+   <span>Pending</span><div class="icon">⏳</div>
+  </div>
+  <h3 id="pendingPayments">0</h3>
+  <p>Pending payments</p>
+ </div>
+
+</div>
+
+<div class="grid2">
+
+ <div class="card">
+  <div class="card-head">
+   <h3>Recent Tournaments</h3>
+   <button class="btn small" onclick="showPageByName('tournaments')">View All</button>
+  </div>
+
+  <div class="table-wrap">
+   <table>
+    <thead>
+     <tr>
+      <th>Tournament</th>
+      <th>Game</th>
+      <th>Entry</th>
+      <th>Status</th>
+     </tr>
+    </thead>
+    <tbody id="recentTournaments"></tbody>
+   </table>
+  </div>
+ </div>
+
+ <div class="card">
+  <div class="card-head">
+   <h3>Recent Payments</h3>
+   <button class="btn small" onclick="showPageByName('payments')">View All</button>
+  </div>
+
+  <div class="table-wrap">
+   <table>
+    <thead>
+     <tr>
+      <th>Player</th>
+      <th>Amount</th>
+      <th>Status</th>
+     </tr>
+    </thead>
+    <tbody id="recentPayments"></tbody>
+   </table>
+  </div>
+ </div>
+
+</div>
+</section>
+
+
+<!-- TOURNAMENTS -->
+<section class="page" id="tournaments">
+
+<div class="toolbar">
+ <input class="search" id="tournamentSearch"
+        oninput="renderTournaments()"
+        placeholder="🔍 Search tournament">
+
+ <button class="btn" onclick="openTournamentModal()">+ Add Tournament</button>
+</div>
+
+<div class="card">
+ <div class="card-head">
+  <h3>All Tournaments</h3>
+ </div>
+
+ <div class="table-wrap">
+  <table>
+   <thead>
+    <tr>
+     <th>Tournament</th>
+     <th>Game</th>
+     <th>Entry</th>
+     <th>Prize</th>
+     <th>Slots</th>
+     <th>Date</th>
+     <th>Status</th>
+     <th>Actions</th>
+    </tr>
+   </thead>
+   <tbody id="tournamentTable"></tbody>
+  </table>
+ </div>
+</div>
+
+</section>
+
+
+<!-- PLAYERS -->
+<section class="page" id="players">
+
+<div class="card">
+
+ <div class="toolbar">
+  <input class="search" id="playerSearch"
+         oninput="renderPlayers()"
+         placeholder="🔍 Search player">
+ </div>
+
+ <div class="table-wrap">
+  <table>
+   <thead>
+    <tr>
+     <th>Player</th>
+     <th>Phone</th>
+     <th>Tournament</th>
+     <th>Payment</th>
+     <th>Action</th>
+    </tr>
+   </thead>
+   <tbody id="playerTable"></tbody>
+  </table>
+ </div>
+
+</div>
+</section>
+
+
+<!-- PAYMENTS -->
+<section class="page" id="payments">
+
+<div class="card">
+
+ <div class="card-head">
+  <h3>Payment Management</h3>
+  <span class="muted">Approve payments to add revenue</span>
+ </div>
+
+ <div class="table-wrap">
+  <table>
+   <thead>
+    <tr>
+     <th>Player</th>
+     <th>Tournament</th>
+     <th>Amount</th>
+     <th>Status</th>
+     <th>Action</th>
+    </tr>
+   </thead>
+   <tbody id="paymentTable"></tbody>
+  </table>
+ </div>
+
+</div>
+</section>
+
+
+<!-- ANNOUNCEMENTS -->
+<section class="page" id="announcements">
+
+<div class="card">
+
+ <div class="card-head">
+  <h3>📢 Website Announcement</h3>
+ </div>
+
+ <div class="field">
+  <label>Announcement</label>
+  <textarea id="announcement"
+   placeholder="Write announcement for players..."></textarea>
+ </div>
+
+ <button class="btn" onclick="saveAnnouncement()">Save Announcement</button>
+
+ <p id="announcementSaved"
+    style="color:#36dca8;margin-top:12px;display:none">
+    Announcement saved successfully.
+ </p>
+
+</div>
+
+</section>
+
+
+<!-- SETTINGS -->
+<section class="page" id="settings">
+
+<div class="card">
+
+ <div class="card-head">
+  <h3>⚙️ Website Settings</h3>
+ </div>
+
+ <div class="field">
+  <label>Website Name</label>
+  <input id="siteName" placeholder="Your Tournament Name">
+ </div>
+
+ <div class="field">
+  <label>UPI ID</label>
+  <input id="upiId" placeholder="example@upi">
+ </div>
+
+ <div class="field">
+  <label>Contact Number</label>
+  <input id="contact" placeholder="+91 XXXXX XXXXX">
+ </div>
+
+ <div class="field">
+  <label>Registration Status</label>
+  <select id="registrationStatus">
+   <option value="open">Open</option>
+   <option value="closed">Closed</option>
+  </select>
+ </div>
+
+ <button class="btn" onclick="saveSettings()">Save Settings</button>
+
+ <p id="settingsSaved"
+    style="color:#36dca8;margin-top:12px;display:none">
+    Settings saved successfully.
+ </p>
+
+</div>
+
+</section>
+
+</main>
+</div>
+
+
+<!-- TOURNAMENT MODAL -->
+<div class="modal" id="tournamentModal">
+
+<div class="modal-box">
+
+ <div class="modal-head">
+  <h3 id="modalTitle">Add Tournament</h3>
+  <button class="close" onclick="closeTournamentModal()">×</button>
+ </div>
+
+ <input type="hidden" id="editId">
+
+ <div class="form-grid">
+
+  <div class="field">
+   <label>Tournament Name</label>
+   <input id="tName" placeholder="BGMI Sunday Cup">
+  </div>
+
+  <div class="field">
+   <label>Game</label>
+   <input id="tGame" placeholder="BGMI">
+  </div>
+
+  <div class="field">
+   <label>Entry Fee ₹</label>
+   <input id="tFee" type="number" placeholder="50">
+  </div>
+
+  <div class="field">
+   <label>Prize Pool ₹</label>
+   <input id="tPrize" type="number" placeholder="5000">
+  </div>
+
+  <div class="field">
+   <label>Total Slots</label>
+   <input id="tSlots" type="number" placeholder="100">
+  </div>
+
+  <div class="field">
+   <label>Date</label>
+   <input id="tDate" type="date">
+  </div>
+
+  <div class="field">
+   <label>Time</label>
+   <input id="tTime" type="time">
+  </div>
+
+  <div class="field">
+   <label>Status</label>
+   <select id="tStatus">
+    <option value="Upcoming">Upcoming</option>
+    <option value="Live">Live</option>
+    <option value="Completed">Completed</option>
+   </select>
+  </div>
+
+  <div class="field full-field">
+   <label>Tournament Rules</label>
+   <textarea id="tRules"
+    placeholder="Write tournament rules..."></textarea>
+  </div>
+
+  <div class="field full-field">
+   <label>Payment QR Code Image</label>
+   <input class="file" id="qrFile"
+          type="file"
+          accept="image/*"
+          onchange="previewQR(event)">
+   <img id="qrPreview" class="qr-preview">
+  </div>
+
+ </div>
+
+ <div class="modal-actions">
+  <button class="btn dark" onclick="closeTournamentModal()">Cancel</button>
+  <button class="btn" onclick="saveTournament()">Save Tournament</button>
+ </div>
+
+</div>
+</div>
+
+
+<script>
+
+/* ================= DATA ================= */
+
+let tournaments =
+ JSON.parse(localStorage.getItem("tournaments") || "[]");
+
+let players =
+ JSON.parse(localStorage.getItem("players") || "[]");
+
+let payments =
+ JSON.parse(localStorage.getItem("payments") || "[]");
+
+
+/* ================= LOGIN ================= */
+
+function login(){
+
+ const u=document.getElementById("loginUser").value.trim();
+ const p=document.getElementById("loginPass").value.trim();
+
+ if(u==="admin" && p==="1234"){
+
+  localStorage.setItem("adminLoggedIn","yes");
+
+  document.getElementById("loginScreen").style.display="none";
+  document.getElementById("app").style.display="block";
+
+  renderAll();
+
+ }else{
+  alert("Wrong username or password!");
+ }
+}
+
+
+function logout(){
+
+ localStorage.removeItem("adminLoggedIn");
+
+ document.getElementById("app").style.display="none";
+ document.getElementById("loginScreen").style.display="flex";
+}
+
+
+/* ================= PAGE ================= */
+
+function showPage(page,btn){
+
+ document.querySelectorAll(".page")
+   .forEach(x=>x.classList.remove("active"));
+
+ document.getElementById(page)
+   .classList.add("active");
+
+ document.querySelectorAll(".nav button")
+   .forEach(x=>x.classList.remove("active"));
+
+ if(btn)btn.classList.add("active");
+
+ const titles={
+  dashboard:"Dashboard",
+  tournaments:"Tournaments",
+  players:"Players",
+  payments:"Payments",
+  announcements:"Announcements",
+  settings:"Settings"
+ };
+
+ document.getElementById("pageTitle").innerText=titles[page];
+
+ closeSidebar();
+}
+
+
+function showPageByName(page){
+
+ const buttons=document.querySelectorAll(".nav button");
+
+ let index={
+  dashboard:0,
+  tournaments:1,
+  players:2,
+  payments:3,
+  announcements:4,
+  settings:5
+ }[page];
+
+ showPage(page,buttons[index]);
+}
+
+
+/* ================= DASHBOARD ================= */
+
+function renderDashboard(){
+
+ document.getElementById("totalTournaments").innerText=
+  tournaments.length;
+
+ document.getElementById("totalPlayers").innerText=
+  players.length;
+
+ const revenue=payments
+  .filter(x=>x.status==="Approved")
+  .reduce((sum,x)=>sum+Number(x.amount||0),0);
+
+ document.getElementById("totalRevenue").innerText=
+  revenue.toLocaleString("en-IN");
+
+ document.getElementById("pendingPayments").innerText=
+  payments.filter(x=>x.status==="Pending").length;
+
+
+ const rt=document.getElementById("recentTournaments");
+
+ if(!tournaments.length){
+  rt.innerHTML=`<tr><td colspan="4" class="empty">No tournaments yet</td></tr>`;
+ }else{
+  rt.innerHTML=tournaments.slice(-5).reverse().map(t=>`
+   <tr>
+    <td><b>${escapeHTML(t.name)}</b></td>
+    <td>${escapeHTML(t.game)}</td>
+    <td>₹${Number(t.fee||0)}</td>
+    <td>${statusBadge(t.status)}</td>
+   </tr>
+  `).join("");
+ }
+
+
+ const rp=document.getElementById("recentPayments");
+
+ if(!payments.length){
+  rp.innerHTML=`<tr><td colspan="3" class="empty">No payments yet</td></tr>`;
+ }else{
+  rp.innerHTML=payments.slice(-5).reverse().map(p=>`
+   <tr>
+    <td>${escapeHTML(p.player)}</td>
+    <td>₹${Number(p.amount||0)}</td>
+    <td>${statusBadge(p.status)}</td>
+   </tr>
+  `).join("");
+ }
+}
+
+
+/* ================= TOURNAMENT ================= */
+
+function openTournamentModal(id=null){
+
+ document.getElementById("tournamentModal").classList.add("show");
+
+ if(id){
+
+  const t=tournaments.find(x=>x.id===id);
+  if(!t)return;
+
+  document.getElementById("modalTitle").innerText="Edit Tournament";
+  document.getElementById("editId").value=t.id;
+
+  document.getElementById("tName").value=t.name||"";
+  document.getElementById("tGame").value=t.game||"";
+  document.getElementById("tFee").value=t.fee||"";
+  document.getElementById("tPrize").value=t.prize||"";
+  document.getElementById("tSlots").value=t.slots||"";
+  document.getElementById("tDate").value=t.date||"";
+  document.getElementById("tTime").value=t.time||"";
+  document.getElementById("tStatus").value=t.status||"Upcoming";
+  document.getElementById("tRules").value=t.rules||"";
+
+  if(t.qr){
+   const img=document.getElementById("qrPreview");
+   img.src=t.qr;
+   img.style.display="block";
+  }
+
+ }else{
+
+  document.getElementById("modalTitle").innerText="Add Tournament";
+  document.getElementById("editId").value="";
+
+  [
+   "tName","tGame","tFee","tPrize","tSlots",
+   "tDate","tTime","tRules"
+  ].forEach(id=>{
+   document.getElementById(id).value="";
+  });
+
+  document.getElementById("tStatus").value="Upcoming";
+
+  const img=document.getElementById("qrPreview");
+  img.src="";
+  img.style.display="none";
+ }
+}
+
+
+function closeTournamentModal(){
+ document.getElementById("tournamentModal")
+   .classList.remove("show");
+}
+
+
+function previewQR(event){
+
+ const file=event.target.files[0];
+
+ if(!file)return;
+
+ if(!file.type.startsWith("image/")){
+  alert("Please select an image.");
+  return;
+ }
+
+ const reader=new FileReader();
+
+ reader.onload=function(e){
+  const img=document.getElementById("qrPreview");
+  img.src=e.target.result;
+  img.style.display="block";
+ };
+
+ reader.readAsDataURL(file);
+}
+
+
+function saveTournament(){
+
+ const name=document.getElementById("tName").value.trim();
+
+ if(!name){
+  alert("Tour
